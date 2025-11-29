@@ -1,0 +1,78 @@
+// ==UserScript==
+// @name         Useful mod
+// @namespace    http://tampermonkey.net/
+// @version      2025-11-26
+// @description  try to take over the world!
+// @author       shjor
+// @match        https://bonk.io/*
+// @grant        none
+// ==/UserScript==
+
+(function() {
+    'use strict';
+
+    // Create the button
+    const btn = document.createElement("button");
+    btn.innerText = "Enable (only when you joined a room)";
+    btn.style.position = "fixed";
+    btn.style.top = "10px";
+    btn.style.left = "10px";
+    btn.style.zIndex = "999999";
+    document.body.appendChild(btn);
+
+    btn.addEventListener("click", () => {
+        btn.innerText = "Injected!";
+
+        // Chatbox finder that checks:
+        //    1. main document
+        //    2. maingameframe iframe
+        function getChatBox() {
+            // 1. Try main doc
+            let box = document.getElementById("newbonklobby_chat_input");
+            if (box) return box;
+
+            // 2. Try iframe
+            const frame = document.getElementById("maingameframe");
+            if (!frame){
+                alert("WHERE'S THE GAME 😭😭")
+                        return null;}
+
+            try {
+                const fDoc = frame.contentDocument || frame.contentWindow.document;
+                return fDoc.getElementById("newbonklobby_chat_input");
+            } catch (e) {
+                return null; // cross-origin safeguard (shouldn't happen)
+            }
+        }
+
+        // Add key listener
+        document.addEventListener("keyup", () => {
+            const chatbox = getChatBox();
+            if (!chatbox){
+                alert("Mod failed to find chatbox 😭🤞")
+                return;
+            }
+            if (chatbox.value.trim() === "!mod force_refresh") {
+                window.location.reload();
+                alert("If you see this message the mod failed to refresh the page.")
+            }
+            if(chatbox.value.trim() === "!mod zoom_full"){
+               document.body.style.zoom = "120%";
+            }
+            if(chatbox.value.trim() === "!mod zoomout_full"){
+               document.body.style.zoom = "50%";
+            }
+            if(chatbox.value.trim() === "!mod zoom_reset_laptop"){
+               document.body.style.zoom = "90%";
+            }
+            if(chatbox.value.trim() === "!mod zoom_reset_pc"){
+               document.body.style.zoom = "67%";
+            }
+	    if(chatbox.value.trim() === "!mod force_close"){
+               window.close()
+               alert("Failed to close")
+            }
+        });
+    });
+
+})();
